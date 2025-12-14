@@ -1528,6 +1528,7 @@
     </div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="apk_data.js"></script>
     <script>
         // Supabase 설정
         const supabaseUrl = 'https://dmgtwzbvpualecnrcyug.supabase.co'
@@ -1571,7 +1572,7 @@
         }
 
         // 안드로이드 APK 다운로드 기능
-        async function downloadApk() {
+        function downloadApk() {
             const userAgent = navigator.userAgent.toLowerCase();
             const isAndroid = userAgent.indexOf('android') > -1;
 
@@ -1581,26 +1582,27 @@
                 return;
             }
 
-            // 안드로이드 기기인 경우 확실한 다운로드 실행
-            const apkUrl = 'app/알기앙 공연 정보.apk';
+            // 안드로이드 기기인 경우 base64 데이터를 사용하여 다운로드
             const apkFileName = '알기앙 공연 정보.apk';
 
             try {
-                // APK 파일을 fetch로 가져와서 Blob 생성
-                const response = await fetch(apkUrl);
+                // base64 데이터를 바이너리 데이터로 변환
+                const binaryString = atob(APK_BASE64);
+                const bytes = new Uint8Array(binaryString.length);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
                 }
 
-                const blob = await response.blob();
+                // Blob 생성
+                const blob = new Blob([bytes], { type: 'application/vnd.android.package-archive' });
 
-                // Blob 크기 확인 (너무 작은 파일은 오류)
-                if (blob.size < 1000) { // 1KB 미만은 오류로 간주
-                    throw new Error('APK 파일이 제대로 로드되지 않았습니다.');
+                // Blob 크기 확인
+                if (blob.size < 1000000) { // 1MB 미만은 오류로 간주
+                    throw new Error('APK 파일 데이터가 올바르지 않습니다.');
                 }
 
-                // 다운로드 링크 생성
+                // 다운로드 URL 생성
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -1622,7 +1624,7 @@
 
             } catch (error) {
                 console.error('APK 다운로드 오류:', error);
-                alert('다운로드 중 오류가 발생했습니다.\n\n' + error.message + '\n\n다시 시도해 주세요.');
+                alert('다운로드 중 오류가 발생했습니다.\n\n' + error.message + '\n\n페이지를 새로고침 후 다시 시도해 주세요.');
             }
         }
 
