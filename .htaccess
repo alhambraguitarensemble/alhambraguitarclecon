@@ -1,0 +1,15 @@
+# APK 파일 MIME 타입 설정
+<Files "알기앙 공연 정보.apk">
+    ForceType application/vnd.android.package-archive
+    Header set Content-Disposition attachment; filename="알기앙 공연 정보.apk"
+</Files>
+
+# APK 파일 확장자에 대한 MIME 타입 설정
+AddType application/vnd.android.package-archive .apk
+
+# 모든 APK 파일에 대한 캐시 제어
+<FilesMatch "\.apk$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>
