@@ -915,9 +915,13 @@
         }
 
         .download-section h4 {
-            color: #2E7D32;
+            color: #ffffff; /* 흰색으로 변경하여 대비 향상 */
+            background: #4CAF50; /* 녹색 배경 추가 */
+            padding: 8px 12px;
+            border-radius: 6px;
             margin-bottom: 10px;
             font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* 텍스트 그림자 추가 */
         }
 
         /* 권한 설정 섹션 배경색 */
@@ -930,9 +934,13 @@
         }
 
         .permission-section h4 {
-            color: #E65100;
+            color: #ffffff; /* 흰색으로 변경하여 대비 향상 */
+            background: #FF9800; /* 주황색 배경 추가 */
+            padding: 8px 12px;
+            border-radius: 6px;
             margin-bottom: 10px;
             font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* 텍스트 그림자 추가 */
         }
 
         .troubleshooting {
@@ -1386,7 +1394,8 @@
                     <div class="install-step">
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
-                            💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.
+                            💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
+                                    카카오톡 in-app 브라우저에서는 동작하지 않으므로 링크를 복사하여 외부 브라우저에서 실행하세요.
                         </div>
                         <div class="download-section">
                             <h4>다운로드 후 설치 방법:</h4>
@@ -1395,12 +1404,12 @@
                                 • Chrome 브라우저: '다운로드' 또는 'Download' 폴더<br>
                                 • Samsung Internet: 'Download' 폴더<br>
                                 • 기타 브라우저: 기본 다운로드 폴더<br>
-                                • PC에서 전송된 경우: 'Download' → 'Received from PC' 폴더
+                                
                             </div>
                             <ul>
                                 <li>1. <strong>파일 관리자</strong> 앱을 실행합니다.</li>
-                                <li>2. 다운로드 폴더에서 <strong>'concert.zip'</strong> 파일을 찾습니다.</li>
-                                <li>3. 압축을 해제하여 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
+                                <li>2. 다운로드 폴더에서 <strong>'concert.apk'</strong> 파일을 찾습니다.</li>
+                                <li>3. 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
                                 <li>4. <strong>'설치'</strong> 버튼을 클릭합니다.</li>
                                 <li>5. 설치 완료 후 <strong>'열기'</strong>를 눌러 앱을 실행합니다.</li>
                             </ul>
@@ -1422,7 +1431,7 @@
                                        
                     <div style="text-align: center; margin-top: 30px;">
                         <button class="app-download-button" onclick="downloadApk()">
-                            📱 알기앙 공연 정보 앱 다운로드 (.zip)
+                            📱 알기앙 공연 정보 앱 다운로드
                         </button>
                     </div>
                 </div>
@@ -1618,8 +1627,8 @@
             } */
 
             // 안드로이드 기기인 경우 확실한 다운로드 실행
-            const apkUrl = 'app/concert.zip';
-            const apkFileName = 'concert.zip';
+            const apkUrl = 'app/concert.apk';
+            const apkFileName = 'concert.apk';
 
             // 다운로드 시작 알림 표시
             showDownloadStartNotification();
@@ -1721,7 +1730,7 @@
 
             // 5. 설치 가이드 표시 (약간 지연)
             setTimeout(() => {
-                const guideMessage = `✅ 다운로드가 완료되었습니다!\n\n실제 다운로드 폴더에서 'concert.zip' 파일을 확인해주세요.`;
+                const guideMessage = `✅ 다운로드가 완료되었습니다!\n\n실제 다운로드 폴더에서 'concert.apk' 파일을 확인해주세요.`;
                 alert(guideMessage);
             }, 500);
         }
