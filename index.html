@@ -905,6 +905,36 @@
             font-size: 0.95rem;
         }
 
+        /* 다운로드 설치 섹션 배경색 */
+        .download-section {
+            background: rgba(76, 175, 80, 0.15); /* 연한 녹색 */
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 3px solid #4CAF50; /* 녹색 테두리 */
+        }
+
+        .download-section h4 {
+            color: #2E7D32;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* 권한 설정 섹션 배경색 */
+        .permission-section {
+            background: rgba(255, 152, 0, 0.15); /* 연한 주황색 */
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 3px solid #FF9800; /* 주황색 테두리 */
+        }
+
+        .permission-section h4 {
+            color: #E65100;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
         .troubleshooting {
             background: rgba(109, 89, 122, 0.4);
         }
@@ -1358,29 +1388,34 @@
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.
                         </div>
-                        <h4>다운로드 후 설치 방법:</h4>
-                        <div class="step-tip">
-                            📂 <strong>다운로드 폴더 위치:</strong><br>
-                            • Chrome 브라우저: '다운로드' 또는 'Download' 폴더<br>
-                            • Samsung Internet: 'Download' 폴더<br>
-                            • 기타 브라우저: 기본 다운로드 폴더<br>
-                            • PC에서 전송된 경우: 'Download' → 'Received from PC' 폴더
+                        <div class="download-section">
+                            <h4>다운로드 후 설치 방법:</h4>
+                            <div class="step-tip">
+                                📂 <strong>다운로드 폴더 위치:</strong><br>
+                                • Chrome 브라우저: '다운로드' 또는 'Download' 폴더<br>
+                                • Samsung Internet: 'Download' 폴더<br>
+                                • 기타 브라우저: 기본 다운로드 폴더<br>
+                                • PC에서 전송된 경우: 'Download' → 'Received from PC' 폴더
+                            </div>
+                            <ul>
+                                <li>1. <strong>파일 관리자</strong> 앱을 실행합니다.</li>
+                                <li>2. 다운로드 폴더에서 <strong>'concert.apk'</strong> 파일을 찾습니다.</li>
+                                <li>3. 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
+                                <li>4. <strong>'설치'</strong> 버튼을 클릭합니다.</li>
+                                <li>5. 설치 완료 후 <strong>'열기'</strong>를 눌러 앱을 실행합니다.</li>
+                            </ul>
                         </div>
-                        <ul>
-                            <li>1. <strong>파일 관리자</strong> 앱을 실행합니다.</li>
-                            <li>2. 다운로드 폴더에서 <strong>'concert.apk'</strong> 파일을 찾습니다.</li>
-                            <li>3. 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
-                            <li>4. <strong>'설치'</strong> 버튼을 클릭합니다.</li>
-                            <li>5. 설치 완료 후 <strong>'열기'</strong>를 눌러 앱을 실행합니다.</li>
-                        </ul>
-                        <h4>설치가 안 되는 경우 (권한 설정):</h4>
-                        <ul>
-                            <li>1. '설정' 앱 실행 → '보안' 또는 '개인정보 보호' 메뉴 선택</li>
-                            <li>2. '출처를 알 수 없는 앱 설치' 또는 '알 수 없는 출처' 항목을 찾습니다.</li>
-                            <li>3. 이 브라우저(Chrome, Samsung Internet 등)를 선택합니다.</li>
-                            <li>4. <strong>'이 출처 허용'</strong> 또는 <strong>'허용'</strong>을 켜줍니다.</li>
-                            <li>5. 다시 "앱 다운로드" 버튼을 클릭합니다.</li>
-                        </ul>
+
+                        <div class="permission-section">
+                            <h4>설치가 안 되는 경우 (권한 설정):</h4>
+                            <ul>
+                                <li>1. '설정' 앱 실행 → '보안' 또는 '개인정보 보호' 메뉴 선택</li>
+                                <li>2. '출처를 알 수 없는 앱 설치' 또는 '알 수 없는 출처' 항목을 찾습니다.</li>
+                                <li>3. 이 브라우저(Chrome, Samsung Internet 등)를 선택합니다.</li>
+                                <li>4. <strong>'이 출처 허용'</strong> 또는 <strong>'허용'</strong>을 켜줍니다.</li>
+                                <li>5. 다시 "앱 다운로드" 버튼을 클릭합니다.</li>
+                            </ul>
+                        </div>
                         <p class="step-tip">🚨 <strong>보안 팁:</strong> 설치 완료 후에는 "출처를 알 수 없는 앱 설치" 설정을 다시 끄는 것이 안전합니다.</p>
                     </div>
                     
@@ -1586,8 +1621,12 @@
             const apkUrl = 'app/concert.apk';
             const apkFileName = 'concert.apk';
 
+            // 다운로드 시작 알림 표시
+            showDownloadStartNotification();
+
             try {
                 // APK 파일을 fetch로 가져와서 Blob 생성
+                console.log('APK 파일 다운로드 시작...');
                 const response = await fetch(apkUrl);
 
                 if (!response.ok) {
@@ -1595,6 +1634,7 @@
                 }
 
                 const blob = await response.blob();
+                console.log(`APK 파일 로드 완료: ${blob.size} bytes`);
 
                 // Blob 크기 확인 (너무 작은 파일은 오류)
                 if (blob.size < 1000000) { // 1MB 미만은 오류로 간주
@@ -1608,6 +1648,7 @@
                 link.download = apkFileName;
                 link.style.display = 'none';
 
+                console.log('다운로드 링크 클릭...');
                 // 다운로드 실행
                 document.body.appendChild(link);
                 link.click();
@@ -1616,15 +1657,52 @@
                 // 메모리 해제
                 window.URL.revokeObjectURL(url);
 
-                // 다운로드 완료 후 설치 안내 표시
+                // 다운로드 완료 후 설치 안내 표시 (더 긴 지연 시간)
                 setTimeout(() => {
+                    console.log('다운로드 완료 알림 표시');
                     showInstallGuide(apkFileName);
-                }, 1000);
+                }, 5000); // 5초로 증가
 
             } catch (error) {
                 console.error('APK 다운로드 오류:', error);
                 alert('다운로드 중 오류가 발생했습니다.\n\n' + error.message + '\n\n다시 시도해 주세요.');
             }
+        }
+
+        // 다운로드 시작 알림 표시 함수
+        function showDownloadStartNotification() {
+            // 간단한 시작 알림 (진동)
+            if ('vibrate' in navigator) {
+                navigator.vibrate(100); // 짧은 진동
+            }
+
+            // 시각적 피드백
+            const startMsg = document.createElement('div');
+            startMsg.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(76, 164, 241, 0.9);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                z-index: 10000;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            `;
+            startMsg.innerHTML = '📥 다운로드 준비 중...<br><small>잠시만 기다려주세요</small>';
+
+            document.body.appendChild(startMsg);
+
+            // 2초 후 제거
+            setTimeout(() => {
+                if (document.body.contains(startMsg)) {
+                    document.body.removeChild(startMsg);
+                }
+            }, 2000);
         }
 
         // 다운로드 완료 알림 및 설치 가이드 표시 함수
@@ -1643,7 +1721,7 @@
 
             // 5. 설치 가이드 표시 (약간 지연)
             setTimeout(() => {
-                const guideMessage = `🎉 앱 다운로드가 완료되었습니다!
+                const guideMessage = `✅ 다운로드가 완료되었습니다!\n\n실제 다운로드 폴더에서 'concert.apk' 파일을 확인해주세요.
 
 📂 파일 위치 확인:
 • Chrome 브라우저: '다운로드' 폴더
@@ -1653,7 +1731,7 @@
 
 ⚙️ 설치 방법:
 1. 📱 파일 관리자 앱 실행
-2. 🔍 해당 폴더에서 '${fileName}' 파일 찾기
+2. 🔍 해당 폴더에서 'concert.apk' 파일 찾기
 3. 👆 파일을 탭하여 설치 시작
 4. ✅ '설치' 버튼 클릭
 
