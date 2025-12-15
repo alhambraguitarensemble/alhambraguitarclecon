@@ -1630,17 +1630,49 @@
             const isAndroid = navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
             if (isAndroid) {
-                // 안드로이드에서는 intent URL 사용
-                const intentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
-                window.location.href = intentUrl;
+                // 안드로이드에서는 Chrome 앱 직접 실행 시도
+                try {
+                    // 1. Chrome 앱 스킴 사용
+                    const chromeUrl = `googlechrome://${targetUrl.replace('https://', '')}`;
+                    window.location.href = chromeUrl;
 
-                // 폴백: 일반 URL로 시도
-                setTimeout(() => {
-                    window.open(targetUrl, '_blank');
-                }, 1000);
+                    // 2. Chrome이 없으면 Chrome 패키지 지정 intent 시도
+                    setTimeout(() => {
+                        if (document.hasFocus()) { // Chrome이 열리지 않았으면
+                            const chromeIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
+                            window.location.href = chromeIntentUrl;
+
+                            // 3. Chrome이 정말 없으면 삼성 인터넷 시도
+                            setTimeout(() => {
+                                if (document.hasFocus()) { // 삼성 인터넷 시도
+                                    const samsungIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.sec.android.app.sbrowser;end`;
+                                    window.location.href = samsungIntentUrl;
+
+                                    // 4. 삼성 인터넷도 없으면 일반 브라우저 intent 사용
+                                    setTimeout(() => {
+                                        if (document.hasFocus()) {
+                                            const generalIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+                                            window.location.href = generalIntentUrl;
+
+                                            // 5. 최종 폴백: 일반 window.open 사용
+                                            setTimeout(() => {
+                                                if (document.hasFocus()) {
+                                                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                                                }
+                                            }, 1500);
+                                        }
+                                    }, 1500);
+                                }
+                            }, 1500);
+                        }
+                    }, 1000);
+                } catch (error) {
+                    console.log('브라우저 실행 실패, 일반 방식으로 시도');
+                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                }
             } else {
                 // iOS나 기타 기기에서는 새 창으로 열기
-                window.open(targetUrl, '_blank');
+                window.open(targetUrl, '_blank', 'noopener,noreferrer');
             }
         }
 
@@ -1651,10 +1683,14 @@
 
             // 카카오톡 인앱 브라우저 감지 및 처리
             if (isKakaoTalkInAppBrowser()) {
-                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저에서 자동으로 다운로드를 시작합니다.');
+                const userChoice = confirm('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저(Chrome 등)에서 다운로드를 진행하시겠습니까?');
 
-                // 외부 브라우저에서 열기 (자동 다운로드 파라미터 포함)
-                openInExternalBrowser();
+                if (userChoice) {
+                    // 사용자가 동의한 경우에만 외부 브라우저 열기
+                    openInExternalBrowser();
+                } else {
+                    alert('다운로드를 취소했습니다.\n\n다른 브라우저에서 다시 시도해주세요.');
+                }
                 return;
             }
 
