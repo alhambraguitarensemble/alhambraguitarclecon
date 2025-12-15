@@ -1395,7 +1395,7 @@
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
-                                    카카오톡 in-app 브라우저에서는 동작하지 않으므로 링크를 복사하여 외부 브라우저에서 실행하세요.
+                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환됩니다.</small>
                         </div>
                         <div class="download-section">
                             <h4>다운로드 후 설치 방법:</h4>
@@ -1615,10 +1615,45 @@
             window.open(googleCalendarUrl, '_blank');
         }
 
+        // 카카오톡 인앱 브라우저 감지 함수
+        function isKakaoTalkInAppBrowser() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            return userAgent.indexOf('kakaotalk') > -1 || userAgent.indexOf('kakao') > -1;
+        }
+
+        // 외부 브라우저에서 열기 함수
+        function openInExternalBrowser() {
+            const currentUrl = window.location.href;
+            const isAndroid = navigator.userAgent.toLowerCase().indexOf('android') > -1;
+
+            if (isAndroid) {
+                // 안드로이드에서는 intent URL 사용
+                const intentUrl = `intent://${encodeURIComponent(currentUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+                window.location.href = intentUrl;
+
+                // 폴백: 일반 URL로 시도
+                setTimeout(() => {
+                    window.open(currentUrl, '_blank');
+                }, 1000);
+            } else {
+                // iOS나 기타 기기에서는 새 창으로 열기
+                window.open(currentUrl, '_blank');
+            }
+        }
+
         // 안드로이드 APK 다운로드 기능
         async function downloadApk() {
             const userAgent = navigator.userAgent.toLowerCase();
             const isAndroid = userAgent.indexOf('android') > -1;
+
+            // 카카오톡 인앱 브라우저 감지 및 처리
+            if (isKakaoTalkInAppBrowser()) {
+                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저(Chrome, Samsung Internet 등)에서 다시 시도해주세요.');
+
+                // 외부 브라우저에서 열기 시도
+                openInExternalBrowser();
+                return;
+            }
 
             /* if (!isAndroid) {
                 // 안드로이드가 아닌 경우
