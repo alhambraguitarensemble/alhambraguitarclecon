@@ -1395,7 +1395,7 @@
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
-                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환됩니다.</small>
+                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드 페이지로 이동합니다.</small>
                         </div>
                         <div class="download-section">
                             <h4>다운로드 후 설치 방법:</h4>
@@ -1623,21 +1623,21 @@
 
         // 외부 브라우저에서 열기 함수
         function openInExternalBrowser() {
-            const currentUrl = window.location.href;
+            const targetUrl = 'https://alhambraguitarensemble.github.io/alhambraguitarclecon';
             const isAndroid = navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
             if (isAndroid) {
                 // 안드로이드에서는 intent URL 사용
-                const intentUrl = `intent://${encodeURIComponent(currentUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+                const intentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
                 window.location.href = intentUrl;
 
                 // 폴백: 일반 URL로 시도
                 setTimeout(() => {
-                    window.open(currentUrl, '_blank');
+                    window.open(targetUrl, '_blank');
                 }, 1000);
             } else {
                 // iOS나 기타 기기에서는 새 창으로 열기
-                window.open(currentUrl, '_blank');
+                window.open(targetUrl, '_blank');
             }
         }
 
@@ -1648,9 +1648,9 @@
 
             // 카카오톡 인앱 브라우저 감지 및 처리
             if (isKakaoTalkInAppBrowser()) {
-                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저(Chrome, Samsung Internet 등)에서 다시 시도해주세요.');
+                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저로 자동 전환하여 다운로드를 진행합니다.');
 
-                // 외부 브라우저에서 열기 시도
+                // 외부 브라우저에서 열기
                 openInExternalBrowser();
                 return;
             }
@@ -1701,11 +1701,21 @@
                 // 메모리 해제
                 window.URL.revokeObjectURL(url);
 
-                // 다운로드 완료 후 설치 안내 표시 (더 긴 지연 시간)
+                // 다운로드 진행 중임을 사용자에게 알림
+                alert('📥 다운로드가 시작되었습니다.\n\n파일 관리자에서 \'concert.apk\' 파일이 나타날 때까지 잠시 기다려주세요.');
+
+                // 다운로드 완료 확인을 위한 간단한 타이머
+                // 실제 다운로드 성공/실패를 정확히 감지하기 어려우므로
+                // 사용자에게 직접 확인하도록 안내
                 setTimeout(() => {
-                    console.log('다운로드 완료 알림 표시');
-                    showInstallGuide(apkFileName);
-                }, 5000); // 5초로 증가
+                    const userConfirmed = confirm('다운로드가 완료되었나요?\n\n파일 관리자에서 concert.apk 파일을 찾을 수 있으면 "확인"을 눌러주세요.');
+                    if (userConfirmed) {
+                        console.log('사용자 확인 - 설치 가이드 표시');
+                        showInstallGuide(apkFileName);
+                    } else {
+                        alert('다운로드가 아직 진행 중이거나 취소되었을 수 있습니다.\n\n다시 시도해주세요.');
+                    }
+                }, 8000); // 8초 후 확인
 
             } catch (error) {
                 console.error('APK 다운로드 오류:', error);
