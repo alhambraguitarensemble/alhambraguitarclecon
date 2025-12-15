@@ -1642,24 +1642,23 @@
                             const chromeIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.android.chrome;end`;
                             window.location.href = chromeIntentUrl;
 
-                            // 3. Chrome이 정말 없으면 삼성 인터넷 시도
+                            // 3. Chrome이 없으면 일반 브라우저 intent 사용
                             setTimeout(() => {
-                                if (document.hasFocus()) { // 삼성 인터넷 시도
-                                    const samsungIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;package=com.sec.android.app.sbrowser;end`;
-                                    window.location.href = samsungIntentUrl;
+                                if (document.hasFocus()) {
+                                    const generalIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+                                    window.location.href = generalIntentUrl;
 
-                                    // 4. 삼성 인터넷도 없으면 일반 브라우저 intent 사용
+                                    // 4. 일반 브라우저도 실패 시 window.open 사용
                                     setTimeout(() => {
                                         if (document.hasFocus()) {
-                                            const generalIntentUrl = `intent://${encodeURIComponent(targetUrl)}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
-                                            window.location.href = generalIntentUrl;
+                                            window.open(targetUrl, '_blank', 'noopener,noreferrer');
 
-                                            // 5. 최종 폴백: 일반 window.open 사용
+                                            // 5. 모든 시도 실패 시 링크 복사 기능 제공
                                             setTimeout(() => {
                                                 if (document.hasFocus()) {
-                                                    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+                                                    provideLinkCopy(targetUrl);
                                                 }
-                                            }, 1500);
+                                            }, 2000);
                                         }
                                     }, 1500);
                                 }
@@ -1796,6 +1795,62 @@
                     document.body.removeChild(startMsg);
                 }
             }, 2000);
+        }
+
+        // 링크 복사 기능 제공 함수
+        function provideLinkCopy(targetUrl) {
+            const copyText = `다음 링크를 복사하여 브라우저 주소창에 붙여넣기 해주세요:\n\n${targetUrl}\n\n복사 후 브라우저에서 열리면 앱 다운로드 버튼을 클릭하세요.`;
+
+            // 클립보드에 복사 시도
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(targetUrl).then(() => {
+                    alert('🔗 다운로드 링크가 클립보드에 복사되었습니다!\n\n' + copyText);
+                }).catch(() => {
+                    // 클립보드 복사 실패 시 수동 복사 안내
+                    showManualCopyInstructions(targetUrl);
+                });
+            } else {
+                // 클립보드 API 미지원 시 수동 복사 안내
+                showManualCopyInstructions(targetUrl);
+            }
+        }
+
+        // 수동 복사 안내 함수
+        function showManualCopyInstructions(targetUrl) {
+            const instructions = `🔗 외부 브라우저에서 다운로드하기:
+
+1. 아래 링크를 전체 선택하여 복사하세요:
+   ${targetUrl}
+
+2. 외부 브라우저(Chrome 등)를 열고 주소창에 붙여넣기하세요
+
+3. 페이지가 열리면 [앱 다운로드] 버튼을 클릭하세요
+
+💡 팁: 링크를 길게 눌러 "링크 복사"를 선택할 수도 있습니다.`;
+
+            alert(instructions);
+
+            // 추가로 텍스트 입력 필드에 링크 표시 (선택적으로 복사 가능하도록)
+            const textArea = document.createElement('textarea');
+            textArea.value = targetUrl;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // 모바일용
+
+            // 사용자에게 링크 표시
+            const linkDisplay = document.createElement('div');
+            linkDisplay.innerHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                     background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                     z-index: 10000; max-width: 90%; font-family: monospace; font-size: 12px; word-break: break-all;">
+                    <strong>📋 다운로드 링크 (길게 눌러 복사):</strong><br>
+                    <span style="color: #0066cc;">${targetUrl}</span><br><br>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: #666; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">닫기</button>
+                </div>
+            `;
+            document.body.appendChild(linkDisplay);
         }
 
         // 다운로드 완료 알림 및 설치 가이드 표시 함수
