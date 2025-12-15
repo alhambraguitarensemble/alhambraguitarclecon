@@ -1399,8 +1399,8 @@
                             </div>
                             <ul>
                                 <li>1. <strong>파일 관리자</strong> 앱을 실행합니다.</li>
-                                <li>2. 다운로드 폴더에서 <strong>'concert.apk'</strong> 파일을 찾습니다.</li>
-                                <li>3. 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
+                                <li>2. 다운로드 폴더에서 <strong>'concert.zip'</strong> 파일을 찾습니다.</li>
+                                <li>3. 압축을 해제하여 파일을 탭하면 설치 확인 팝업이 나타납니다.</li>
                                 <li>4. <strong>'설치'</strong> 버튼을 클릭합니다.</li>
                                 <li>5. 설치 완료 후 <strong>'열기'</strong>를 눌러 앱을 실행합니다.</li>
                             </ul>
@@ -1422,7 +1422,7 @@
                                        
                     <div style="text-align: center; margin-top: 30px;">
                         <button class="app-download-button" onclick="downloadApk()">
-                            📱 알기앙 공연 정보 앱 다운로드
+                            📱 알기앙 공연 정보 앱 다운로드 (.zip)
                         </button>
                     </div>
                 </div>
@@ -1618,8 +1618,8 @@
             } */
 
             // 안드로이드 기기인 경우 확실한 다운로드 실행
-            const apkUrl = 'app/concert.apk';
-            const apkFileName = 'concert.apk';
+            const apkUrl = 'app/concert.zip';
+            const apkFileName = 'concert.zip';
 
             // 다운로드 시작 알림 표시
             showDownloadStartNotification();
@@ -1721,7 +1721,7 @@
 
             // 5. 설치 가이드 표시 (약간 지연)
             setTimeout(() => {
-                const guideMessage = `✅ 다운로드가 완료되었습니다!\n\n실제 다운로드 폴더에서 'concert.apk' 파일을 확인해주세요.`;
+                const guideMessage = `✅ 다운로드가 완료되었습니다!\n\n실제 다운로드 폴더에서 'concert.zip' 파일을 확인해주세요.`;
                 alert(guideMessage);
             }, 500);
         }
