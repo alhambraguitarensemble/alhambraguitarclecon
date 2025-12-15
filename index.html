@@ -1395,7 +1395,7 @@
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
-                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드 페이지로 이동합니다.</small>
+                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드가 시작됩니다.</small>
                         </div>
                         <div class="download-section">
                             <h4>다운로드 후 설치 방법:</h4>
@@ -1623,7 +1623,10 @@
 
         // 외부 브라우저에서 열기 함수
         function openInExternalBrowser() {
-            const targetUrl = 'https://alhambraguitarensemble.github.io/alhambraguitarclecon';
+            // 현재 페이지 URL에 다운로드 파라미터 추가
+            const currentUrl = window.location.href;
+            const targetUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') + 'download=auto';
+
             const isAndroid = navigator.userAgent.toLowerCase().indexOf('android') > -1;
 
             if (isAndroid) {
@@ -1648,9 +1651,9 @@
 
             // 카카오톡 인앱 브라우저 감지 및 처리
             if (isKakaoTalkInAppBrowser()) {
-                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저로 자동 전환하여 다운로드를 진행합니다.');
+                alert('📱 카카오톡 브라우저에서는 다운로드가 제한됩니다.\n\n외부 브라우저에서 자동으로 다운로드를 시작합니다.');
 
-                // 외부 브라우저에서 열기
+                // 외부 브라우저에서 열기 (자동 다운로드 파라미터 포함)
                 openInExternalBrowser();
                 return;
             }
@@ -2438,10 +2441,20 @@
             ]
         };
 
-        // 페이지 로드 시 게시글 렌더링
+        // 페이지 로드 시 게시글 렌더링 및 자동 다운로드 확인
         document.addEventListener('DOMContentLoaded', function() {
             fetchPosts();
             initializeArchives();
+
+            // URL 파라미터에서 자동 다운로드 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('download') === 'auto') {
+                // 외부 브라우저에서 자동 다운로드 시작 (약간 지연)
+                setTimeout(() => {
+                    console.log('외부 브라우저에서 자동 다운로드 시작');
+                    downloadApk();
+                }, 1000);
+            }
         });
 
         // 아카이브 초기화
