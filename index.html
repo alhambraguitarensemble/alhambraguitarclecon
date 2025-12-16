@@ -897,6 +897,23 @@
             color: #fff8e7;
         }
 
+        .link-copy-btn:hover, .link-copy-btn-small:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .link-copy-btn:active, .link-copy-btn-small:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .link-copy-btn-small:hover {
+            background: rgba(255, 107, 107, 0.2) !important;
+            border-color: rgba(255, 107, 107, 0.5) !important;
+        }
+
         .step-tip {
             background: rgba(109, 89, 122, 0.5);
             padding: 10px 15px;
@@ -1034,6 +1051,25 @@
             }
             100% {
                 transform: translateX(calc(-100% - 200%));
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            90% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
             }
         }
 
@@ -1395,7 +1431,10 @@
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
-                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드가 시작됩니다.</small>
+                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드가 시작됩니다. 다운로드 실패시 외부 브라우저에서 링크를 붙여넣기하여 실행하세요.
+                            <button onclick="copyCurrentUrl()" class="link-copy-btn-small" style="background: rgba(255, 255, 255, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s ease; margin-left: 8px; vertical-align: middle;">
+                                🔗 복사
+                            </button></small>
                         </div>
                         <div class="download-section">
                             <h4>다운로드 후 설치 방법:</h4>
@@ -1652,13 +1691,7 @@
                                     setTimeout(() => {
                                         if (document.hasFocus()) {
                                             window.open(targetUrl, '_blank', 'noopener,noreferrer');
-
-                                            // 5. 모든 시도 실패 시 링크 복사 기능 제공
-                                            setTimeout(() => {
-                                                if (document.hasFocus()) {
-                                                    provideLinkCopy(targetUrl);
-                                                }
-                                            }, 2000);
+                                          
                                         }
                                     }, 1500);
                                 }
@@ -1797,60 +1830,89 @@
             }, 2000);
         }
 
-        // 링크 복사 기능 제공 함수
-        function provideLinkCopy(targetUrl) {
-            const copyText = `다음 링크를 복사하여 브라우저 주소창에 붙여넣기 해주세요:\n\n${targetUrl}\n\n복사 후 브라우저에서 열리면 앱 다운로드 버튼을 클릭하세요.`;
+        // 현재 URL 복사 함수
+        function copyCurrentUrl() {
+            const currentUrl = window.location.href;
 
-            // 클립보드에 복사 시도
+            // 클립보드 API 사용 시도
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(targetUrl).then(() => {
-                    alert('🔗 다운로드 링크가 클립보드에 복사되었습니다!\n\n' + copyText);
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    // 복사 성공 시 피드백 표시
+                    showCopyFeedback('✅ 링크가 클립보드에 복사되었습니다!');
                 }).catch(() => {
-                    // 클립보드 복사 실패 시 수동 복사 안내
-                    showManualCopyInstructions(targetUrl);
+                    // 클립보드 API 실패 시 대안 방법 사용
+                    fallbackCopyToClipboard(currentUrl);
                 });
             } else {
-                // 클립보드 API 미지원 시 수동 복사 안내
-                showManualCopyInstructions(targetUrl);
+                // 클립보드 API 미지원 시 대안 방법 사용
+                fallbackCopyToClipboard(currentUrl);
             }
         }
 
-        // 수동 복사 안내 함수
-        function showManualCopyInstructions(targetUrl) {
-            const instructions = `🔗 외부 브라우저에서 다운로드하기:
-
-1. 아래 링크를 전체 선택하여 복사하세요:
-   ${targetUrl}
-
-2. 외부 브라우저(Chrome 등)를 열고 주소창에 붙여넣기하세요
-
-3. 페이지가 열리면 [앱 다운로드] 버튼을 클릭하세요
-
-💡 팁: 링크를 길게 눌러 "링크 복사"를 선택할 수도 있습니다.`;
-
-            alert(instructions);
-
-            // 추가로 텍스트 입력 필드에 링크 표시 (선택적으로 복사 가능하도록)
+        // 클립보드 복사 대안 방법
+        function fallbackCopyToClipboard(text) {
+            // 임시 텍스트 영역 생성
             const textArea = document.createElement('textarea');
-            textArea.value = targetUrl;
+            textArea.value = text;
             textArea.style.position = 'fixed';
             textArea.style.left = '-9999px';
+            textArea.style.top = '-9999px';
             document.body.appendChild(textArea);
+
+            // 텍스트 선택 및 복사
             textArea.select();
             textArea.setSelectionRange(0, 99999); // 모바일용
 
-            // 사용자에게 링크 표시
-            const linkDisplay = document.createElement('div');
-            linkDisplay.innerHTML = `
-                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                     background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                     z-index: 10000; max-width: 90%; font-family: monospace; font-size: 12px; word-break: break-all;">
-                    <strong>📋 다운로드 링크 (길게 눌러 복사):</strong><br>
-                    <span style="color: #0066cc;">${targetUrl}</span><br><br>
-                    <button onclick="this.parentElement.parentElement.remove()" style="background: #666; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">닫기</button>
-                </div>
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyFeedback('✅ 링크가 클립보드에 복사되었습니다!');
+                } else {
+                    showCopyFeedback('❌ 링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+                }
+            } catch (error) {
+                showCopyFeedback('❌ 링크 복사에 실패했습니다. 수동으로 복사해주세요.');
+            }
+
+            // 임시 요소 제거
+            document.body.removeChild(textArea);
+        }
+
+        // 복사 피드백 표시 함수
+        function showCopyFeedback(message) {
+            // 기존 피드백 제거
+            const existingFeedback = document.querySelector('.copy-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            // 새로운 피드백 생성
+            const feedback = document.createElement('div');
+            feedback.className = 'copy-feedback';
+            feedback.textContent = message;
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 10001;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                animation: fadeInOut 3s ease-in-out;
             `;
-            document.body.appendChild(linkDisplay);
+
+            document.body.appendChild(feedback);
+
+            // 3초 후 자동 제거
+            setTimeout(() => {
+                if (document.body.contains(feedback)) {
+                    document.body.removeChild(feedback);
+                }
+            }, 3000);
         }
 
         // 다운로드 완료 알림 및 설치 가이드 표시 함수
