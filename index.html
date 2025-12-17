@@ -1431,9 +1431,9 @@
                         <h3> ⚙️ 설치 방법 </h3>
                         <div class="step-warning">
                             💡 <strong>다운로드 후 설치:</strong> 아래 "앱 다운로드" 버튼을 클릭하면 APK 파일이 다운로드됩니다.<br>
-                            <small style="color: #ff6b6b;">⚠️ 카카오톡 인앱브라우저에서 외부 브라우저로 자동 전환하여 다운로드를 시작합니다. 다운로드 실패시 외부 브라우저에서 링크를 붙여넣기하여 다시 실행하세요.
+                            <small style="color: #ff6b6b;">⚠️ 카카오톡 브라우저에서는 외부 브라우저로 자동 전환되어 다운로드가 시작됩니다. 다운로드 실패시 외부 브라우저에서 링크를 붙여넣기하여 실행하세요.
                             <button onclick="copyCurrentUrl()" class="link-copy-btn-small" style="background: rgba(255, 255, 255, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s ease; margin-left: 8px; vertical-align: middle;">
-                                🔗 링크복사
+                                🔗 링크크복사
                             </button></small>
                         </div>
                         <div class="download-section">
@@ -1611,12 +1611,9 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+   
     <script>
-        // Supabase 설정
-        const supabaseUrl = 'https://dmgtwzbvpualecnrcyug.supabase.co'
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtZ3R3emJ2cHVhbGVjbnJjeXVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxMzAzODUsImV4cCI6MjA3MjcwNjM4NX0.Cddfcij0GL3lLCZz51tALcyKULfGECyq4YNpjVh9Uf4'
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+    
         // 탭 전환 기능
         function showTab(tabName) {
             // 모든 탭 콘텐츠 숨기기
@@ -1723,7 +1720,7 @@
                 } else {
                     alert('다운로드를 취소했습니다.\n\n다른 브라우저에서 다시 시도해주세요.');
                 }
-               return;
+               //return;
             }
 
             /* if (!isAndroid) {
@@ -2278,130 +2275,7 @@
             }
         });
 
-        // 게시판 기능 (Supabase 연결)
-        let posts = [];
-
-        async function fetchPosts() {
-            console.log('게시글 불러오기 시작...');
-            try {
-                const { data, error } = await supabase
-                    .from('posts')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                console.log('Supabase 응답:', { data, error });
-                
-                if (error) throw error;
-                posts = data || [];
-                renderPosts();
-                console.log('게시글 불러오기 성공:', posts.length + '개');
-            } catch (error) {
-                console.error('게시글 불러오기 오류:', error);
-                // 오류 발생 시 로컬 스토리지 사용
-                posts = JSON.parse(localStorage.getItem('posts')) || [];
-                renderPosts();
-                console.log('로컬 스토리지에서 게시글 불러옴:', posts.length + '개');
-            }
-        }
-
-        async function submitPost(event) {
-            event.preventDefault();
-            
-            const author = document.getElementById('author').value.trim();
-            const content = document.getElementById('content').value.trim();
-            
-            if (!author || !content) {
-                alert('작성자와 내용을 모두 입력해주세요.');
-                return;
-            }
-
-            console.log('게시글 작성 시작:', { author, content });
-            
-            try {
-                const { data, error } = await supabase
-                    .from('posts')
-                    .insert([
-                        {
-                            author: author,
-                            content: content,
-                            created_at: new Date().toISOString()
-                        }
-                    ])
-                    .select();
-
-                console.log('Supabase 삽입 응답:', { data, error });
-
-                if (error) throw error;
-                
-                document.getElementById('author').value = '';
-                document.getElementById('content').value = '';
-                
-                await fetchPosts();
-                alert('게시글이 등록되었습니다!');
-                console.log('게시글 작성 성공');
-            } catch (error) {
-                console.error('게시글 등록 오류:', error);
-                // Supabase 오류 시 로컬 스토리지에 저장
-                const newPost = {
-                    id: Date.now(),
-                    author: author,
-                    content: content,
-                    created_at: new Date().toISOString()
-                };
-
-                posts.unshift(newPost);
-                localStorage.setItem('posts', JSON.stringify(posts));
-                
-                document.getElementById('author').value = '';
-                document.getElementById('content').value = '';
-                
-                renderPosts();
-                alert('게시글이 로컬에 저장되었습니다. (Supabase 연결 실패)');
-                console.log('로컬 스토리지에 저장됨');
-            }
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('posts-container');
-            
-            if (posts.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        아직 등록된 게시글이 없습니다.<br />
-                        첫 번째 게시글을 작성해보세요!
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = posts.map(post => `
-                <div class="post-item">
-                    <div class="post-author">${post.author}</div>
-                    <div class="post-content">${post.content}</div>
-                    <div class="post-date">${formatDate(post.created_at)}</div>
-                    <div class="post-actions">
-                        <button class="comment-toggle" onclick="toggleComments(${post.id})">
-                            💬 댓글 <span class="comment-count" id="comment-count-${post.id}">0</span>
-                        </button>
-                    </div>
-                    <div class="comment-section" id="comment-section-${post.id}" style="display: none;">
-                        <div class="comment-form">
-                            <input type="text" id="comment-author-${post.id}" placeholder="댓글 작성자명" maxlength="20">
-                            <textarea id="comment-content-${post.id}" placeholder="댓글 내용을 입력하세요" rows="3" maxlength="200"></textarea>
-                            <button onclick="submitComment(${post.id})">댓글 등록</button>
-                        </div>
-                        <div class="comment-list" id="comment-list-${post.id}">
-                            <!-- 댓글들이 여기에 표시됩니다 -->
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            // 각 게시글의 댓글 수 업데이트
-            posts.forEach(post => {
-                updateCommentCount(post.id);
-            });
-        }
+       
 
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -2414,163 +2288,7 @@
             });
         }
 
-        // 댓글 관련 전역 변수
-        let comments = [];
-
-        // 댓글 토글 기능
-        function toggleComments(postId) {
-            const commentSection = document.getElementById(`comment-section-${postId}`);
-            const isVisible = commentSection.style.display !== 'none';
-            
-            if (isVisible) {
-                commentSection.style.display = 'none';
-            } else {
-                commentSection.style.display = 'block';
-                // 댓글 섹션이 열릴 때 댓글 목록 로드
-                fetchComments(postId);
-            }
-        }
-
-        // 댓글 불러오기
-        async function fetchComments(postId) {
-            console.log('댓글 불러오기 시작...', postId);
-            try {
-                const { data, error } = await supabase
-                    .from('comments')
-                    .select('*')
-                    .eq('post_id', postId)
-                    .order('created_at', { ascending: true });
-                
-                console.log('Supabase 댓글 응답:', { data, error });
-                
-                if (error) throw error;
-                
-                const postComments = data || [];
-                renderComments(postId, postComments);
-                console.log('댓글 불러오기 성공:', postComments.length + '개');
-            } catch (error) {
-                console.error('댓글 불러오기 오류:', error);
-                // 오류 발생 시 로컬 스토리지 사용
-                const allComments = JSON.parse(localStorage.getItem('comments')) || [];
-                const postComments = allComments.filter(comment => comment.post_id === postId);
-                renderComments(postId, postComments);
-                console.log('로컬 스토리지에서 댓글 불러옴:', postComments.length + '개');
-            }
-        }
-
-        // 댓글 렌더링
-        function renderComments(postId, postComments) {
-            const commentList = document.getElementById(`comment-list-${postId}`);
-            
-            if (postComments.length === 0) {
-                commentList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #6b5b7d; font-size: 0.9rem;">
-                        아직 댓글이 없습니다.<br />
-                        첫 번째 댓글을 작성해보세요!
-                    </div>
-                `;
-            } else {
-                commentList.innerHTML = postComments.map(comment => `
-                    <div class="comment-item">
-                        <div class="comment-author">${comment.author}</div>
-                        <div class="comment-content">${comment.content}</div>
-                        <div class="comment-date">${formatDate(comment.created_at)}</div>
-                    </div>
-                `).join('');
-            }
-            
-            // 댓글 수 업데이트
-            updateCommentCount(postId);
-        }
-
-        // 댓글 등록
-        async function submitComment(postId) {
-            const author = document.getElementById(`comment-author-${postId}`).value.trim();
-            const content = document.getElementById(`comment-content-${postId}`).value.trim();
-            
-            if (!author || !content) {
-                alert('작성자와 내용을 모두 입력해주세요.');
-                return;
-            }
-
-            console.log('댓글 작성 시작:', { postId, author, content });
-            
-            try {
-                const { data, error } = await supabase
-                    .from('comments')
-                    .insert([
-                        {
-                            post_id: postId,
-                            author: author,
-                            content: content,
-                            created_at: new Date().toISOString()
-                        }
-                    ])
-                    .select();
-
-                console.log('Supabase 댓글 삽입 응답:', { data, error });
-
-                if (error) throw error;
-                
-                // 입력 필드 초기화
-                document.getElementById(`comment-author-${postId}`).value = '';
-                document.getElementById(`comment-content-${postId}`).value = '';
-                
-                // 댓글 목록 새로고침
-                await fetchComments(postId);
-                console.log('댓글 작성 성공');
-            } catch (error) {
-                console.error('댓글 등록 오류:', error);
-                // Supabase 오류 시 로컬 스토리지에 저장
-                const newComment = {
-                    id: Date.now(),
-                    post_id: postId,
-                    author: author,
-                    content: content,
-                    created_at: new Date().toISOString()
-                };
-
-                const allComments = JSON.parse(localStorage.getItem('comments')) || [];
-                allComments.push(newComment);
-                localStorage.setItem('comments', JSON.stringify(allComments));
-                
-                // 입력 필드 초기화
-                document.getElementById(`comment-author-${postId}`).value = '';
-                document.getElementById(`comment-content-${postId}`).value = '';
-                
-                // 댓글 목록 새로고침
-                fetchComments(postId);
-                alert('댓글이 로컬에 저장되었습니다. (Supabase 연결 실패)');
-                console.log('로컬 스토리지에 댓글 저장됨');
-            }
-        }
-
-        // 댓글 수 업데이트
-        async function updateCommentCount(postId) {
-            try {
-                const { data, error } = await supabase
-                    .from('comments')
-                    .select('id')
-                    .eq('post_id', postId);
-                
-                if (error) throw error;
-                
-                const count = data ? data.length : 0;
-                const countElement = document.getElementById(`comment-count-${postId}`);
-                if (countElement) {
-                    countElement.textContent = count;
-                }
-            } catch (error) {
-                console.error('댓글 수 업데이트 오류:', error);
-                // 로컬 스토리지에서 댓글 수 계산
-                const allComments = JSON.parse(localStorage.getItem('comments')) || [];
-                const count = allComments.filter(comment => comment.post_id === postId).length;
-                const countElement = document.getElementById(`comment-count-${postId}`);
-                if (countElement) {
-                    countElement.textContent = count;
-                }
-            }
-        }
+    
 
         // 아카이브 초기화 및 데이터 정의
         const archiveData = {
@@ -2596,7 +2314,7 @@
 
         // 페이지 로드 시 게시글 렌더링 및 자동 다운로드 확인
         document.addEventListener('DOMContentLoaded', function() {
-            fetchPosts();
+
             initializeArchives();
 
             // URL 파라미터에서 자동 다운로드 확인
